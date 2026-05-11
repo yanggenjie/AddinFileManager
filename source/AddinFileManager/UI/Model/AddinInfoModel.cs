@@ -21,6 +21,35 @@ public class AddinInfoModel
     [OnChangedMethod(nameof(OnIsOnChanged))]
     public bool IsOn { get; set; }
     public ICommand OpenFolderCommand => new RelayCommand(x => OpenFolder());
+    
+    public Action<AddinInfoModel> DeleteAction { get; set; }
+    
+    public ICommand DeleteCommand => new RelayCommand(x => DeleteAddin());
+
+    private void DeleteAddin()
+    {
+        var result = MessageBox.Show($"确定要删除插件文件 {AddinFileName} 吗？\n删除后将无法恢复！", "删除确认", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+        if (result == MessageBoxResult.Yes)
+        {
+            try
+            {
+                if (File.Exists(FileFullPath))
+                {
+                    File.Delete(FileFullPath);
+                }
+                DeleteAction?.Invoke(this);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                MessageBox.Show("权限不足，请以管理员身份运行此程序以删除文件。", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"删除文件失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+    }
+
     private bool _isUpdating;
     private void OnIsOnChanged()
     {

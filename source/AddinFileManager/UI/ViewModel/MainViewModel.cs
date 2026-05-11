@@ -109,6 +109,8 @@ public class MainViewModel
                     AddinFileName = fileName,
                     IsOn = !fileExt.Equals(CommonString.DisableExt, StringComparison.OrdinalIgnoreCase),
                 };
+                
+                addinInfo.DeleteAction = (model) => AddinFileItems.Remove(model);
 
                 try
                 {
