@@ -18,8 +18,24 @@ namespace AddinFileManager.UI.View
             Versions = new ObservableCollection<string>(config.RevitVersions);
             VersionsListBox.ItemsSource = Versions;
 
-            // 设置版本号
-            VersionTextBlock.Text = $"版本: {Assembly.GetExecutingAssembly().GetName().Version}";
+            // 设置关于信息
+            var assembly = Assembly.GetExecutingAssembly();
+            VersionTextBlock.Text = assembly.GetName().Version.ToString();
+            
+            // 获取版权信息
+            var copyrightAttr = assembly.GetCustomAttribute<AssemblyCopyrightAttribute>();
+            if (copyrightAttr != null)
+            {
+                CopyrightTextBlock.Text = copyrightAttr.Copyright;
+            }
+
+            // 获取更新时间（通过程序集的最后写入时间）
+            string location = assembly.Location;
+            if (!string.IsNullOrEmpty(location) && System.IO.File.Exists(location))
+            {
+                var fileInfo = new System.IO.FileInfo(location);
+                UpdateTimeTextBlock.Text = fileInfo.LastWriteTime.ToString("yyyy-MM-dd HH:mm");
+            }
         }
 
         private void NavListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
