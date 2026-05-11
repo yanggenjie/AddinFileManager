@@ -1,6 +1,7 @@
 using AddinFileManager.Common;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -16,6 +17,28 @@ namespace AddinFileManager.UI.View
             var config = ConfigManager.LoadConfig();
             Versions = new ObservableCollection<string>(config.RevitVersions);
             VersionsListBox.ItemsSource = Versions;
+
+            // 设置版本号
+            VersionTextBlock.Text = $"版本: {Assembly.GetExecutingAssembly().GetName().Version}";
+        }
+
+        private void NavListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (NavListBox.SelectedIndex == 0)
+            {
+                if (VersionSettingsPanel != null) VersionSettingsPanel.Visibility = Visibility.Visible;
+                if (AboutPanel != null) AboutPanel.Visibility = Visibility.Collapsed;
+            }
+            else if (NavListBox.SelectedIndex == 1)
+            {
+                if (VersionSettingsPanel != null) VersionSettingsPanel.Visibility = Visibility.Collapsed;
+                if (AboutPanel != null) AboutPanel.Visibility = Visibility.Visible;
+            }
+        }
+
+        private void CheckUpdateButton_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("当前已是最新版本。", "检查更新", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         private void AddButton_Click(object sender, RoutedEventArgs e)

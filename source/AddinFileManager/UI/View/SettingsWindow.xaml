@@ -5,50 +5,79 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
         mc:Ignorable="d"
-        Title="设置 Revit 版本" Height="400" Width="300" WindowStartupLocation="CenterOwner" ResizeMode="NoResize">
-    <Grid Margin="10">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
-        
-        <Grid Grid.Row="0" Margin="0,0,0,10">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-            <TextBox x:Name="NewVersionTextBox" mah:TextBoxHelper.Watermark="例如: 2026" Margin="0,0,10,0"/>
-            <Button Grid.Column="1" Content="添加" Width="60" Click="AddButton_Click"/>
-        </Grid>
-        
-        <ListBox x:Name="VersionsListBox" Grid.Row="1" Margin="0,0,0,10">
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Text="{Binding}" VerticalAlignment="Center"/>
-                        <Button Grid.Column="1" Content="删除" Width="50" Margin="10,0,0,0" Click="DeleteButton_Click" Tag="{Binding}"/>
-                    </Grid>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-            <ListBox.ItemContainerStyle>
-                <Style TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}">
-                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-                </Style>
-            </ListBox.ItemContainerStyle>
-        </ListBox>
-        
-        <Grid Grid.Row="2">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <Button Grid.Column="0" Content="保存" Margin="0,0,5,0" Click="SaveButton_Click"/>
-            <Button Grid.Column="1" Content="取消" Margin="5,0,0,0" Click="CancelButton_Click"/>
+        Title="设置" Height="450" Width="600" WindowStartupLocation="CenterOwner" ResizeMode="NoResize" FontSize="14">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="150"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- 左侧导航 -->
+        <Border BorderBrush="#DDDDDD" BorderThickness="0,0,1,0" Grid.Column="0">
+            <ListBox x:Name="NavListBox" SelectionChanged="NavListBox_SelectionChanged" SelectedIndex="0" BorderThickness="0">
+                <ListBoxItem Content="版本设置" Padding="15,10"/>
+                <ListBoxItem Content="关于" Padding="15,10"/>
+            </ListBox>
+        </Border>
+
+        <!-- 右侧内容 -->
+        <Grid Grid.Column="1" Margin="20">
+            <!-- 版本设置面板 -->
+            <Grid x:Name="VersionSettingsPanel" Visibility="Visible">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                
+                <Grid Grid.Row="0" Margin="0,0,0,10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox x:Name="NewVersionTextBox" mah:TextBoxHelper.Watermark="例如: 2026" Margin="0,0,10,0"/>
+                    <Button Grid.Column="1" Content="添加" Width="60" Click="AddButton_Click"/>
+                </Grid>
+                
+                <ListBox x:Name="VersionsListBox" Grid.Row="1" Margin="0,0,0,10">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="{Binding}" VerticalAlignment="Center"/>
+                                <Button Grid.Column="1" Content="删除" Width="50" Margin="10,0,0,0" Click="DeleteButton_Click" Tag="{Binding}"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}">
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                </ListBox>
+                
+                <Grid Grid.Row="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Button Grid.Column="0" Content="保存" Margin="0,0,5,0" Click="SaveButton_Click"/>
+                    <Button Grid.Column="1" Content="取消" Margin="5,0,0,0" Click="CancelButton_Click"/>
+                </Grid>
+            </Grid>
+
+            <!-- 关于面板 -->
+            <Grid x:Name="AboutPanel" Visibility="Collapsed">
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <TextBlock Text="Revit 插件管理器" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+                    <TextBlock Text="Addin FileManager" FontSize="16" HorizontalAlignment="Center" Margin="0,0,0,10" Foreground="Gray"/>
+                    <TextBlock x:Name="VersionTextBlock" Text="版本: 1.0.0.0" FontSize="14" HorizontalAlignment="Center" Margin="0,0,0,30"/>
+                    <Button Content="检查更新" Width="120" Height="35" Click="CheckUpdateButton_Click" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Grid>
         </Grid>
     </Grid>
 </Window>
