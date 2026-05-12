@@ -85,12 +85,16 @@
                         <TextBlock x:Name="UpdateTimeTextBlock" Text="2024-01-01"/>
                     </StackPanel>
                     
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,25">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,10">
                         <TextBlock Text="版权所有: " Foreground="Gray"/>
                         <TextBlock x:Name="CopyrightTextBlock" Text="© 2024 RyzeYang"/>
                     </StackPanel>
 
-                    <Button Content="检查更新" Width="120" Height="35" Click="CheckUpdateButton_Click" HorizontalAlignment="Center"/>
+                    <TextBlock HorizontalAlignment="Center" Margin="0,0,0,25">
+                        <Hyperlink NavigateUri="https://yanggenjie.cn/MySoft/RevitAddinfileManager.html" RequestNavigate="Hyperlink_RequestNavigate">
+                            查看更新日志
+                        </Hyperlink>
+                    </TextBlock>
                 </StackPanel>
             </Grid>
         </Grid>

@@ -52,9 +52,14 @@ namespace AddinFileManager.UI.View
             }
         }
 
-        private void CheckUpdateButton_Click(object sender, RoutedEventArgs e)
+        private void Hyperlink_RequestNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
         {
-            MessageBox.Show("当前已是最新版本。", "检查更新", MessageBoxButton.OK, MessageBoxImage.Information);
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+            {
+                FileName = e.Uri.AbsoluteUri,
+                UseShellExecute = true
+            });
+            e.Handled = true;
         }
 
         private void AddButton_Click(object sender, RoutedEventArgs e)
