@@ -47,7 +47,6 @@ namespace AddinFileManager.Common
             {
                 RevitVersions = new List<string>
                 {
-                    "Autodesk Revit 2015",
                     "Autodesk Revit 2016",
                     "Autodesk Revit 2017",
                     "Autodesk Revit 2018",
@@ -57,7 +56,9 @@ namespace AddinFileManager.Common
                     "Autodesk Revit 2022",
                     "Autodesk Revit 2023",
                     "Autodesk Revit 2024",
-                    "Autodesk Revit 2025"
+                    "Autodesk Revit 2025",
+                    "Autodesk Revit 2026",
+                    "Autodesk Revit 2027"
                 }
             };
         }
