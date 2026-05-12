@@ -31,7 +31,7 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTextColumn Width="*" Binding="{Binding Remark, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Header="Name" IsReadOnly="True"/>
-                <DataGridTemplateColumn Width="70" Header="禁用">
+                <DataGridTemplateColumn Width="70" Header="启用">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <mah:ToggleSwitch IsOn="{Binding IsOn, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" OffContent="" OnContent=""/>
