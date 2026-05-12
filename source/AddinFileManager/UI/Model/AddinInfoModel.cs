@@ -6,6 +6,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Input;
 using System;
+using System.Linq;
 
 namespace AddinFileManager.UI.Model;
 
@@ -28,8 +29,18 @@ public class AddinInfoModel
 
     private void DeleteAddin()
     {
-        var result = MessageBox.Show($"确定要删除插件文件 {AddinFileName} 吗？\n删除后将无法恢复！", "删除确认", MessageBoxButton.YesNo, MessageBoxImage.Warning);
-        if (result == MessageBoxResult.Yes)
+        bool isConfirmed = false;
+        Application.Current.Dispatcher.Invoke(() =>
+        {
+            var activeWindow = Application.Current.Windows.OfType<Window>().SingleOrDefault(x => x.IsActive) ?? Application.Current.MainWindow;
+            var dialog = new AddinFileManager.UI.View.ConfirmWindow($"确定要删除插件文件 {AddinFileName} 吗？\n删除后将无法恢复！", "删除确认")
+            {
+                Owner = activeWindow
+            };
+            isConfirmed = dialog.ShowDialog() == true;
+        });
+
+        if (isConfirmed)
         {
             try
             {
