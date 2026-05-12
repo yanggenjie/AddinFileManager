@@ -22,6 +22,9 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         this.DataContext = new MainViewModel();
+        
+        var version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+        this.Title = $"Revit插件管理器 v{version.Major}.{version.Minor}.{version.Build} - Copyright © RyzeYang 2024";
     }
 
     private void SettingsButton_Click(object sender, RoutedEventArgs e)
