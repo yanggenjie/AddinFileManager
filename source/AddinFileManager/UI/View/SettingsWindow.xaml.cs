@@ -12,6 +12,9 @@ namespace AddinFileManager.UI.View
 {
     public partial class SettingsWindow : Window
     {
+        private static readonly Regex DigitsOnlyRegex = new(@"^\d+$", RegexOptions.Compiled);
+        private static readonly Regex FourDigitYearRegex = new(@"^\d{4}$", RegexOptions.Compiled);
+
         public ObservableCollection<string> Versions { get; set; }
 
         public SettingsWindow()
@@ -23,18 +26,15 @@ namespace AddinFileManager.UI.View
             Versions.CollectionChanged += Versions_CollectionChanged;
             UpdateEmptyHint();
 
-            // 设置关于信息
             var assembly = Assembly.GetExecutingAssembly();
             VersionTextBlock.Text = assembly.GetName().Version.ToString();
 
-            // 获取版权信息
             var copyrightAttr = assembly.GetCustomAttribute<AssemblyCopyrightAttribute>();
             if (copyrightAttr != null)
             {
                 CopyrightTextBlock.Text = copyrightAttr.Copyright;
             }
 
-            // 获取更新时间（通过程序集的最后写入时间）
             string location = assembly.Location;
             if (!string.IsNullOrEmpty(location) && System.IO.File.Exists(location))
             {
@@ -42,7 +42,6 @@ namespace AddinFileManager.UI.View
                 UpdateTimeTextBlock.Text = fileInfo.LastWriteTime.ToString("yyyy-MM-dd HH:mm");
             }
 
-            // 设置输入框最大长度
             NewVersionTextBox.MaxLength = 4;
         }
 
@@ -59,23 +58,17 @@ namespace AddinFileManager.UI.View
             }
         }
 
-        /// <summary>
-        /// 输入校验：仅允许数字输入
-        /// </summary>
         private void NewVersionTextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
-            e.Handled = !Regex.IsMatch(e.Text, @"^[0-9]+$");
+            e.Handled = !DigitsOnlyRegex.IsMatch(e.Text);
         }
 
-        /// <summary>
-        /// 粘贴校验：仅允许粘贴数字
-        /// </summary>
         private void NewVersionTextBox_Pasting(object sender, DataObjectPastingEventArgs e)
         {
             if (e.DataObject.GetDataPresent(typeof(string)))
             {
                 string text = (string)e.DataObject.GetData(typeof(string));
-                if (!Regex.IsMatch(text, @"^[0-9]+$"))
+                if (!DigitsOnlyRegex.IsMatch(text))
                 {
                     e.CancelCommand();
                 }
@@ -124,15 +117,13 @@ namespace AddinFileManager.UI.View
         {
             var text = NewVersionTextBox.Text.Trim();
 
-            // 校验：非空检查
             if (string.IsNullOrEmpty(text))
             {
                 MessageBox.Show("请输入版本号", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
-            // 校验：必须是4位数字
-            if (!Regex.IsMatch(text, @"^\d{4}$"))
+            if (!FourDigitYearRegex.IsMatch(text))
             {
                 MessageBox.Show("版本号必须是4位数字，例如：2024、2025", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
@@ -147,7 +138,6 @@ namespace AddinFileManager.UI.View
             }
 
             Versions.Add(newVersion);
-            // Sort versions
             var sorted = Versions.OrderBy(v => v).ToList();
             Versions.Clear();
             foreach (var v in sorted)

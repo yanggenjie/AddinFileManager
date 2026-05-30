@@ -25,101 +25,85 @@ public class MainViewModel
         "Dynamo",
     ];
 
-    private static readonly Regex WhitespaceRegex = new Regex(@"\s+", RegexOptions.Compiled);
+    private static readonly Regex WhitespaceRegex = new(@"\s+", RegexOptions.Compiled);
+
+    private List<AddinInfoModel> _cachedFilteredItems;
+    private string _lastSearchText = string.Empty;
+    private ICommand _batchEnableCommand;
+    private ICommand _batchDisableCommand;
+    private ICommand _refreshCommand;
 
     [OnChangedMethod(nameof(OnSelectedVersionChanged))]
     public string SelectedVersion { get; set; }
 
-    /// <summary>
-    /// 搜索文本
-    /// </summary>
-    [AlsoNotifyFor(nameof(FilteredAddinItems))]
+    [AlsoNotifyFor(nameof(FilteredAddinItems), nameof(TotalCount), nameof(EnabledCount), nameof(DisabledCount), nameof(FilteredCount))]
     public string SearchText { get; set; } = string.Empty;
 
-    /// <summary>
-    /// 总插件数量
-    /// </summary>
     public int TotalCount => AddinFileItems.Count;
-
-    /// <summary>
-    /// 已启用插件数量
-    /// </summary>
     public int EnabledCount => AddinFileItems.Count(x => x.IsOn);
-
-    /// <summary>
-    /// 已禁用插件数量
-    /// </summary>
     public int DisabledCount => AddinFileItems.Count(x => !x.IsOn);
-
-    /// <summary>
-    /// 过滤后的插件数量
-    /// </summary>
     public int FilteredCount => FilteredAddinItems.Count();
 
-    /// <summary>
-    /// 过滤后的插件列表
-    /// </summary>
     public IEnumerable<AddinInfoModel> FilteredAddinItems
     {
         get
         {
             if (string.IsNullOrWhiteSpace(SearchText))
+            {
+                _cachedFilteredItems = null;
+                _lastSearchText = string.Empty;
                 return AddinFileItems;
+            }
 
+            if (_cachedFilteredItems != null && _lastSearchText == SearchText)
+                return _cachedFilteredItems;
+
+            _lastSearchText = SearchText;
             var search = SearchText.ToLowerInvariant();
-            return AddinFileItems.Where(x =>
+            _cachedFilteredItems = AddinFileItems.Where(x =>
                 x.AddinFileName?.ToLowerInvariant().Contains(search) == true ||
-                x.Remark?.ToLowerInvariant().Contains(search) == true);
+                x.Remark?.ToLowerInvariant().Contains(search) == true).ToList();
+
+            return _cachedFilteredItems;
         }
     }
 
-    /// <summary>
-    /// 全选复选框绑定
-    /// </summary>
     public bool IsAllSelected
     {
-        get => FilteredAddinItems.Any() && FilteredAddinItems.All(x => x.IsSelected);
+        get
+        {
+            var items = _cachedFilteredItems ?? FilteredAddinItems.ToList();
+            return items.Count > 0 && items.All(x => x.IsSelected);
+        }
         set
         {
             foreach (var item in FilteredAddinItems)
-            {
                 item.IsSelected = value;
-            }
         }
     }
 
-    /// <summary>
-    /// 批量启用命令
-    /// </summary>
-    public ICommand BatchEnableCommand => new RelayCommand(
+    public ICommand BatchEnableCommand => _batchEnableCommand ??= new RelayCommand(
         _ => BatchEnable(true),
         _ => FilteredAddinItems.Any(item => item.IsSelected && !item.IsOn));
 
-    /// <summary>
-    /// 批量禁用命令
-    /// </summary>
-    public ICommand BatchDisableCommand => new RelayCommand(
+    public ICommand BatchDisableCommand => _batchDisableCommand ??= new RelayCommand(
         _ => BatchEnable(false),
         _ => FilteredAddinItems.Any(item => item.IsSelected && item.IsOn));
 
-    /// <summary>
-    /// 刷新命令
-    /// </summary>
-    public ICommand RefreshCommand => new RelayCommand(_ => OnSelectedVersionChanged());
+    public ICommand RefreshCommand => _refreshCommand ??= new RelayCommand(_ => OnSelectedVersionChanged());
 
     private void OnSelectedVersionChanged()
     {
         AddinFileItems.Clear();
+        _cachedFilteredItems = null;
         SearchText = string.Empty;
         var version = SelectedVersion?.Split(' ').LastOrDefault();
         if (string.IsNullOrWhiteSpace(version)) return;
 
-        // 全局目录
         var commonAppData = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
         var appFolder = Path.Combine(commonAppData, @"Autodesk\Revit\Addins");
         GetApplicationAddinInfos(appFolder, version, "全局安装目录");
 
-        // 用户目录
         var userProfileFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
         var userFolder = Path.Combine(userProfileFolder, @"Autodesk\Revit\Addins");
         GetApplicationAddinInfos(userFolder, version, "用户安装目录");
@@ -152,13 +136,7 @@ public class MainViewModel
                     var disableFile = files.FirstOrDefault(f => f.EndsWith(CommonString.DisableExt, StringComparison.OrdinalIgnoreCase));
                     if (disableFile != null)
                     {
-                        try
-                        {
-                            File.Delete(disableFile);
-                        }
-                        catch
-                        {
-                        }
+                        try { File.Delete(disableFile); } catch { }
                     }
                     validFiles.Add(group.Key);
                 }
@@ -191,7 +169,7 @@ public class MainViewModel
                     IsOn = !fileExt.Equals(CommonString.DisableExt, StringComparison.OrdinalIgnoreCase),
                 };
 
-                addinInfo.DeleteAction = (model) => AddinFileItems.Remove(model);
+                addinInfo.DeleteAction = model => AddinFileItems.Remove(model);
 
                 try
                 {
@@ -202,30 +180,18 @@ public class MainViewModel
                         addinInfo.Remark = WhitespaceRegex.Replace(addinName, "");
                     }
                 }
-                catch (Exception)
-                {
-                    // Ignore file read errors for individual files
-                }
+                catch { }
 
                 AddinFileItems.Add(addinInfo);
             }
         }
-        catch (Exception)
-        {
-            // Ignore directory access errors
-        }
+        catch { }
     }
 
-    /// <summary>
-    /// 批量启用/禁用
-    /// </summary>
     private void BatchEnable(bool enable)
     {
-        var selectedItems = FilteredAddinItems.Where(x => x.IsSelected).ToList();
-        foreach (var item in selectedItems)
-        {
+        foreach (var item in FilteredAddinItems.Where(x => x.IsSelected).ToList())
             item.IsOn = enable;
-        }
     }
 
     [DoNotNotify]
@@ -242,8 +208,6 @@ public class MainViewModel
             SelectedVersion = RevitVersionItems.Contains("Autodesk Revit 2020") ? "Autodesk Revit 2020" : RevitVersionItems[RevitVersionItems.Count - 1];
         }
 
-        // PropertyChanged.Fody does not weave OnChanged methods for assignments in the constructor.
-        // Therefore, we need to explicitly call the change handler to load the initial list.
         OnSelectedVersionChanged();
     }
 
@@ -257,3 +221,4 @@ public class MainViewModel
         }
     }
 }
+
