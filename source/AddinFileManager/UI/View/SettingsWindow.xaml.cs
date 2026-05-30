@@ -1,9 +1,12 @@
 using AddinFileManager.Common;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace AddinFileManager.UI.View
 {
@@ -17,11 +20,13 @@ namespace AddinFileManager.UI.View
             var config = ConfigManager.LoadConfig();
             Versions = new ObservableCollection<string>(config.RevitVersions);
             VersionsListBox.ItemsSource = Versions;
+            Versions.CollectionChanged += Versions_CollectionChanged;
+            UpdateEmptyHint();
 
             // 设置关于信息
             var assembly = Assembly.GetExecutingAssembly();
             VersionTextBlock.Text = assembly.GetName().Version.ToString();
-            
+
             // 获取版权信息
             var copyrightAttr = assembly.GetCustomAttribute<AssemblyCopyrightAttribute>();
             if (copyrightAttr != null)
@@ -35,6 +40,49 @@ namespace AddinFileManager.UI.View
             {
                 var fileInfo = new System.IO.FileInfo(location);
                 UpdateTimeTextBlock.Text = fileInfo.LastWriteTime.ToString("yyyy-MM-dd HH:mm");
+            }
+
+            // 设置输入框最大长度
+            NewVersionTextBox.MaxLength = 4;
+        }
+
+        private void Versions_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            UpdateEmptyHint();
+        }
+
+        private void UpdateEmptyHint()
+        {
+            if (EmptyListHint != null)
+            {
+                EmptyListHint.Visibility = Versions.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
+            }
+        }
+
+        /// <summary>
+        /// 输入校验：仅允许数字输入
+        /// </summary>
+        private void NewVersionTextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            e.Handled = !Regex.IsMatch(e.Text, @"^[0-9]+$");
+        }
+
+        /// <summary>
+        /// 粘贴校验：仅允许粘贴数字
+        /// </summary>
+        private void NewVersionTextBox_Pasting(object sender, DataObjectPastingEventArgs e)
+        {
+            if (e.DataObject.GetDataPresent(typeof(string)))
+            {
+                string text = (string)e.DataObject.GetData(typeof(string));
+                if (!Regex.IsMatch(text, @"^[0-9]+$"))
+                {
+                    e.CancelCommand();
+                }
+            }
+            else
+            {
+                e.CancelCommand();
             }
         }
 
@@ -54,35 +102,57 @@ namespace AddinFileManager.UI.View
 
         private void Hyperlink_RequestNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
         {
+            OpenUpdateLogUrl();
+            e.Handled = true;
+        }
+
+        private void UpdateLogBorder_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            OpenUpdateLogUrl();
+        }
+
+        private static void OpenUpdateLogUrl()
+        {
             System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
             {
-                FileName = e.Uri.AbsoluteUri,
+                FileName = "https://yanggenjie.cn/MySoft/RevitAddinfileManager.html",
                 UseShellExecute = true
             });
-            e.Handled = true;
         }
 
         private void AddButton_Click(object sender, RoutedEventArgs e)
         {
             var text = NewVersionTextBox.Text.Trim();
-            if (string.IsNullOrEmpty(text)) return;
 
-            string newVersion = text;
-            if (int.TryParse(text, out _))
+            // 校验：非空检查
+            if (string.IsNullOrEmpty(text))
             {
-                newVersion = $"Autodesk Revit {text}";
+                MessageBox.Show("请输入版本号", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
             }
 
-            if (!Versions.Contains(newVersion))
+            // 校验：必须是4位数字
+            if (!Regex.IsMatch(text, @"^\d{4}$"))
             {
-                Versions.Add(newVersion);
-                // Sort versions
-                var sorted = Versions.OrderBy(v => v).ToList();
-                Versions.Clear();
-                foreach (var v in sorted)
-                {
-                    Versions.Add(v);
-                }
+                MessageBox.Show("版本号必须是4位数字，例如：2024、2025", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            string newVersion = $"Autodesk Revit {text}";
+
+            if (Versions.Contains(newVersion))
+            {
+                MessageBox.Show($"版本 {text} 已存在", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            Versions.Add(newVersion);
+            // Sort versions
+            var sorted = Versions.OrderBy(v => v).ToList();
+            Versions.Clear();
+            foreach (var v in sorted)
+            {
+                Versions.Add(v);
             }
             NewVersionTextBox.Text = "";
         }
@@ -91,7 +161,12 @@ namespace AddinFileManager.UI.View
         {
             if (sender is Button btn && btn.Tag is string version)
             {
-                Versions.Remove(version);
+                var confirmDialog = new ConfirmWindow($"确定要删除版本 \"{version}\" 吗？", "删除确认");
+                confirmDialog.Owner = this;
+                if (confirmDialog.ShowDialog() == true)
+                {
+                    Versions.Remove(version);
+                }
             }
         }
 
@@ -102,6 +177,7 @@ namespace AddinFileManager.UI.View
                 RevitVersions = Versions.ToList()
             };
             ConfigManager.SaveConfig(config);
+            MessageBox.Show("保存成功！", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
             DialogResult = true;
             Close();
         }

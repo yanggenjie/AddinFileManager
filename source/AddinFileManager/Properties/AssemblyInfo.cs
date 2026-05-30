@@ -8,7 +8,7 @@ using System.Windows;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("AddinFileManager")]
-[assembly: AssemblyDescription("Revit插件管理�?方便禁用和启用Revit插件")]
+[assembly: AssemblyDescription("Revit插件管理�?方便禁用和启用Revit插件")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("RyzeYang")]
 [assembly: AssemblyProduct("AddinFileManager")]
@@ -48,5 +48,5 @@ using System.Windows;
 //      Build Number
 //      Revision
 //
-[assembly: AssemblyVersion("1.0.6.0")]
-[assembly: AssemblyFileVersion("1.0.6.0")]
+[assembly: AssemblyVersion("1.0.7.0")]
+[assembly: AssemblyFileVersion("1.0.7.0")]

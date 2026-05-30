@@ -4,97 +4,293 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+        xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
         mc:Ignorable="d"
-        Title="设置" Height="450" Width="600" WindowStartupLocation="CenterOwner" ResizeMode="NoResize" FontSize="14">
+        Title="设置" Height="450" Width="600" WindowStartupLocation="CenterOwner" ResizeMode="NoResize" FontSize="14"
+        Background="White">
+    <Window.Resources>
+        <!-- 保存按钮样式 -->
+        <Style x:Key="SaveButtonStyle" TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button}">
+            <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.Accent}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="Padding" Value="20,8"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Border" Background="{TemplateBinding Background}" CornerRadius="6" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Border" Property="Opacity" Value="0.9"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Border" Property="Opacity" Value="0.8"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- 取消按钮样式 -->
+        <Style x:Key="CancelButtonStyle" TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button}">
+            <Setter Property="Background" Value="#F0F0F0"/>
+            <Setter Property="Foreground" Value="#666666"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="Padding" Value="20,8"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Border" Background="{TemplateBinding Background}" CornerRadius="6" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="#E0E0E0"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="#D0D0D0"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- 添加按钮样式 -->
+        <Style x:Key="AddButtonStyle" TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button}">
+            <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.Accent}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="Padding" Value="12,6"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Border" Background="{TemplateBinding Background}" CornerRadius="4" Padding="{TemplateBinding Padding}">
+                            <StackPanel Orientation="Horizontal">
+                                <iconPacks:PackIconMaterial Kind="Plus" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                                <ContentPresenter VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Border" Property="Opacity" Value="0.9"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Border" Property="Opacity" Value="0.8"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- 删除按钮样式 -->
+        <Style x:Key="DeleteButtonStyle" TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button}">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#999999"/>
+            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Border" Background="{TemplateBinding Background}" CornerRadius="4" Padding="{TemplateBinding Padding}">
+                            <StackPanel Orientation="Horizontal">
+                                <iconPacks:PackIconMaterial Kind="DeleteOutline" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                                <ContentPresenter VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="#FFEBEE"/>
+                                <Setter Property="Foreground" Value="#E53935"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="#FFCDD2"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="150"/>
+            <ColumnDefinition Width="160"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
         <!-- 左侧导航 -->
-        <Border BorderBrush="#DDDDDD" BorderThickness="0,0,1,0" Grid.Column="0">
-            <ListBox x:Name="NavListBox" SelectionChanged="NavListBox_SelectionChanged" SelectedIndex="0" BorderThickness="0">
-                <ListBoxItem Content="版本设置" Padding="15,10"/>
-                <ListBoxItem Content="关于" Padding="15,10"/>
-            </ListBox>
+        <Border BorderBrush="#E0E0E0" BorderThickness="0,0,1,0" Grid.Column="0" Background="#FAFAFA">
+            <StackPanel Margin="0,10,0,0">
+                <TextBlock Text="设置" FontSize="16" FontWeight="SemiBold" Margin="15,5,0,15" Foreground="#333"/>
+                <ListBox x:Name="NavListBox" SelectionChanged="NavListBox_SelectionChanged" SelectedIndex="0" BorderThickness="0" Background="Transparent">
+                    <ListBoxItem Content="版本设置" Padding="15,12">
+                        <ListBoxItem.Template>
+                            <ControlTemplate TargetType="ListBoxItem">
+                                <Border x:Name="Border" Background="Transparent" Padding="15,12" CornerRadius="0,20,20,0" Margin="0,0,10,2" Cursor="Hand">
+                                    <StackPanel Orientation="Horizontal">
+                                        <iconPacks:PackIconMaterial Kind="CogOutline" VerticalAlignment="Center" Margin="0,0,10,0" Width="18" Height="18"/>
+                                        <ContentPresenter VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="Border" Property="Background" Value="#E3F2FD"/>
+                                    </Trigger>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter TargetName="Border" Property="Background" Value="{DynamicResource MahApps.Brushes.Accent}"/>
+                                        <Setter Property="Foreground" Value="White"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </ListBoxItem.Template>
+                    </ListBoxItem>
+                    <ListBoxItem Content="关于" Padding="15,12">
+                        <ListBoxItem.Template>
+                            <ControlTemplate TargetType="ListBoxItem">
+                                <Border x:Name="Border" Background="Transparent" Padding="15,12" CornerRadius="0,20,20,0" Margin="0,0,10,2" Cursor="Hand">
+                                    <StackPanel Orientation="Horizontal">
+                                        <iconPacks:PackIconMaterial Kind="InformationOutline" VerticalAlignment="Center" Margin="0,0,10,0" Width="18" Height="18"/>
+                                        <ContentPresenter VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="Border" Property="Background" Value="#E3F2FD"/>
+                                    </Trigger>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter TargetName="Border" Property="Background" Value="{DynamicResource MahApps.Brushes.Accent}"/>
+                                        <Setter Property="Foreground" Value="White"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </ListBoxItem.Template>
+                    </ListBoxItem>
+                </ListBox>
+            </StackPanel>
         </Border>
 
         <!-- 右侧内容 -->
-        <Grid Grid.Column="1" Margin="20">
+        <Grid Grid.Column="1" Margin="25">
             <!-- 版本设置面板 -->
             <Grid x:Name="VersionSettingsPanel" Visibility="Visible">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
-                
-                <Grid Grid.Row="0" Margin="0,0,0,10">
+
+                <!-- 标题 -->
+                <TextBlock Grid.Row="0" Text="Revit 版本配置" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,15" Foreground="#333"/>
+
+                <!-- 输入区域 -->
+                <Grid Grid.Row="1" Margin="0,0,0,15">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <TextBox x:Name="NewVersionTextBox" mah:TextBoxHelper.Watermark="例如: 2026" Margin="0,0,10,0"/>
-                    <Button Grid.Column="1" Content="添加" Width="60" Click="AddButton_Click"/>
+                    <TextBox x:Name="NewVersionTextBox"
+                             mah:TextBoxHelper.Watermark="输入 Revit 版本号，如 2026"
+                             mah:TextBoxHelper.ClearTextButton="True"
+                             VerticalAlignment="Center"
+                             Padding="8,6"
+                             PreviewTextInput="NewVersionTextBox_PreviewTextInput"
+                             DataObject.Pasting="NewVersionTextBox_Pasting"/>
+                    <Button Grid.Column="1" Content="添加" Style="{StaticResource AddButtonStyle}" Margin="10,0,0,0" Click="AddButton_Click"/>
                 </Grid>
-                
-                <ListBox x:Name="VersionsListBox" Grid.Row="1" Margin="0,0,0,10">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="{Binding}" VerticalAlignment="Center"/>
-                                <Button Grid.Column="1" Content="删除" Width="50" Margin="10,0,0,0" Click="DeleteButton_Click" Tag="{Binding}"/>
-                            </Grid>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                    <ListBox.ItemContainerStyle>
-                        <Style TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}">
-                            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-                        </Style>
-                    </ListBox.ItemContainerStyle>
-                </ListBox>
-                
-                <Grid Grid.Row="2">
+
+                <!-- 版本列表 -->
+                <Border Grid.Row="2" BorderBrush="#E0E0E0" BorderThickness="1" CornerRadius="8" Margin="0,0,0,15" Background="White">
+                    <Grid>
+                        <ListBox x:Name="VersionsListBox" BorderThickness="0" Background="Transparent" Padding="5">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Background="Transparent" CornerRadius="4" Padding="10,8" Margin="2">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <iconPacks:PackIconMaterial Grid.Column="0" Kind="ApplicationOutline" VerticalAlignment="Center" Margin="0,0,10,0" Foreground="{DynamicResource MahApps.Brushes.Accent}" Width="16" Height="16"/>
+                                            <TextBlock Grid.Column="1" Text="{Binding}" VerticalAlignment="Center" FontSize="14"/>
+                                            <Button Grid.Column="2" Content="删除" Style="{StaticResource DeleteButtonStyle}" Click="DeleteButton_Click" Tag="{Binding}"/>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                            <ListBox.ItemContainerStyle>
+                                <Style TargetType="ListBoxItem" BasedOn="{StaticResource MahApps.Styles.ListBoxItem}">
+                                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                                    <Setter Property="Padding" Value="0"/>
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="ListBoxItem">
+                                                <ContentPresenter/>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </ListBox.ItemContainerStyle>
+                        </ListBox>
+                        <!-- 空列表提示 -->
+                        <TextBlock x:Name="EmptyListHint" Text="暂无版本配置" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#999999" FontSize="14" Visibility="Collapsed"/>
+                    </Grid>
+                </Border>
+
+                <!-- 按钮区域 -->
+                <Grid Grid.Row="3">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <Button Grid.Column="0" Content="保存" Margin="0,0,5,0" Click="SaveButton_Click"/>
-                    <Button Grid.Column="1" Content="取消" Margin="5,0,0,0" Click="CancelButton_Click"/>
+                    <Button Grid.Column="1" Content="保存" Style="{StaticResource SaveButtonStyle}" Margin="0,0,10,0" Click="SaveButton_Click"/>
+                    <Button Grid.Column="2" Content="取消" Style="{StaticResource CancelButtonStyle}" Click="CancelButton_Click"/>
                 </Grid>
             </Grid>
 
             <!-- 关于面板 -->
             <Grid x:Name="AboutPanel" Visibility="Collapsed">
                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                    <TextBlock Text="Revit 插件管理器" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,10"/>
-                    <TextBlock Text="Addin FileManager" FontSize="16" HorizontalAlignment="Center" Margin="0,0,0,10" Foreground="Gray"/>
-                    
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,5">
-                        <TextBlock Text="版本: " Foreground="Gray"/>
-                        <TextBlock x:Name="VersionTextBlock" Text="1.0.0.0"/>
+                    <!-- 应用图标 -->
+                    <Border Width="80" Height="80" CornerRadius="16" Background="{DynamicResource MahApps.Brushes.Accent}" Margin="0,0,0,20">
+                        <iconPacks:PackIconMaterial Kind="ApplicationCogOutline" Width="40" Height="40" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White"/>
+                    </Border>
+
+                    <TextBlock Text="Revit 插件管理器" FontSize="22" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,0,0,5" Foreground="#333"/>
+                    <TextBlock Text="Addin FileManager" FontSize="14" HorizontalAlignment="Center" Margin="0,0,0,20" Foreground="#888"/>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,8">
+                        <TextBlock Text="版本: " Foreground="#888"/>
+                        <TextBlock x:Name="VersionTextBlock" Text="1.0.0.0" FontWeight="Medium"/>
                     </StackPanel>
-                    
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,5">
-                        <TextBlock Text="更新时间: " Foreground="Gray"/>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,8">
+                        <TextBlock Text="更新时间: " Foreground="#888"/>
                         <TextBlock x:Name="UpdateTimeTextBlock" Text="2024-01-01"/>
                     </StackPanel>
-                    
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,10">
-                        <TextBlock Text="版权所有: " Foreground="Gray"/>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,25">
+                        <TextBlock Text="版权所有: " Foreground="#888"/>
                         <TextBlock x:Name="CopyrightTextBlock" Text="© 2024 RyzeYang"/>
                     </StackPanel>
 
-                    <TextBlock HorizontalAlignment="Center" Margin="0,0,0,25">
-                        <Hyperlink NavigateUri="https://yanggenjie.cn/MySoft/RevitAddinfileManager.html" RequestNavigate="Hyperlink_RequestNavigate">
-                            查看更新日志
-                        </Hyperlink>
-                    </TextBlock>
+                    <!-- 更新日志链接 -->
+                    <Border Background="#F5F5F5" CornerRadius="8" Padding="20,12" Cursor="Hand" MouseLeftButtonDown="UpdateLogBorder_MouseLeftButtonDown">
+                        <StackPanel Orientation="Horizontal">
+                            <iconPacks:PackIconMaterial Kind="FileDocumentOutline" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="{DynamicResource MahApps.Brushes.Accent}" Width="18" Height="18"/>
+                            <TextBlock Text="查看更新日志" Foreground="{DynamicResource MahApps.Brushes.Accent}" VerticalAlignment="Center" TextDecorations="Underline"/>
+                        </StackPanel>
+                    </Border>
                 </StackPanel>
             </Grid>
         </Grid>

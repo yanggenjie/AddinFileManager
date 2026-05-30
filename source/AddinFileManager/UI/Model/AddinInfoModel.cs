@@ -19,6 +19,11 @@ public class AddinInfoModel
 
     public string Remark { get; set; }
 
+    /// <summary>
+    /// 批量操作时的选中状态
+    /// </summary>
+    public bool IsSelected { get; set; }
+
     [OnChangedMethod(nameof(OnIsOnChanged))]
     public bool IsOn { get; set; }
     public ICommand OpenFolderCommand => new RelayCommand(x => OpenFolder());
