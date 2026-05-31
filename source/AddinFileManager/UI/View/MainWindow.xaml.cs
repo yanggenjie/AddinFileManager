@@ -3,6 +3,7 @@ using AddinFileManager.UI.View;
 using AddinFileManager.UI.ViewModel;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 
 namespace AddinFileManager;
@@ -39,11 +40,20 @@ public partial class MainWindow : Window
 
     private void AddinDataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
     {
-        // 直接使用当前选中项
-        if (AddinDataGrid.SelectedItem is AddinInfoModel model)
+        // 检查点击的是否是数据行（而非分组头部）
+        var hit = e.OriginalSource as DependencyObject;
+        while (hit != null)
         {
-            ShowAddinDetails(model);
-            e.Handled = true;
+            if (hit is DataGridRow row && row.Item is AddinInfoModel model)
+            {
+                ShowAddinDetails(model);
+                e.Handled = true;
+                return;
+            }
+            // 如果遇到 Expander，说明点击的是分组头部，忽略
+            if (hit is Expander)
+                return;
+            hit = System.Windows.Media.VisualTreeHelper.GetParent(hit);
         }
     }
 
