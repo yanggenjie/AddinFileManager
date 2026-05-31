@@ -1,22 +1,25 @@
-using AddinFileManager.Common;
-using Commander;
 using PropertyChanged;
-using System.Diagnostics;
 using System.IO;
-using System.Windows;
-using System.Windows.Input;
-using System;
-using System.Linq;
+using System.Xml.Linq;
 
 namespace AddinFileManager.UI.Model;
 
 [AddINotifyPropertyChangedInterface]
 public class AddinInfoModel
 {
+    /// <summary>
+    /// 安装位置（全局/用户）
+    /// </summary>
     public string InstallLocation { get; set; }
 
+    /// <summary>
+    /// 插件文件名
+    /// </summary>
     public string AddinFileName { get; set; }
 
+    /// <summary>
+    /// 插件名称（从 .addin 文件解析）
+    /// </summary>
     public string Remark { get; set; }
 
     /// <summary>
@@ -24,127 +27,65 @@ public class AddinInfoModel
     /// </summary>
     public bool IsSelected { get; set; }
 
-    [OnChangedMethod(nameof(OnIsOnChanged))]
+    /// <summary>
+    /// 是否启用
+    /// </summary>
     public bool IsOn { get; set; }
-    public ICommand OpenFolderCommand => new RelayCommand(x => OpenFolder());
-    
-    public Action<AddinInfoModel> DeleteAction { get; set; }
-    
-    public ICommand DeleteCommand => new RelayCommand(x => DeleteAddin());
 
-    private void DeleteAddin()
-    {
-        bool isConfirmed = false;
-        Application.Current.Dispatcher.Invoke(() =>
-        {
-            var activeWindow = Application.Current.Windows.OfType<Window>().SingleOrDefault(x => x.IsActive) ?? Application.Current.MainWindow;
-            var dialog = new AddinFileManager.UI.View.ConfirmWindow($"确定要删除插件文件 {AddinFileName} 吗？\n删除后将无法恢复！", "删除确认")
-            {
-                Owner = activeWindow
-            };
-            isConfirmed = dialog.ShowDialog() == true;
-        });
-
-        if (isConfirmed)
-        {
-            try
-            {
-                if (File.Exists(FileFullPath))
-                {
-                    File.Delete(FileFullPath);
-                }
-                DeleteAction?.Invoke(this);
-            }
-            catch (UnauthorizedAccessException)
-            {
-                MessageBox.Show("权限不足，请以管理员身份运行此程序以删除文件。", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"删除文件失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-    }
-
-    private bool _isUpdating;
-    private void OnIsOnChanged()
-    {
-        if (_isUpdating) return;
-        if (!File.Exists(FileFullPath)) return;
-        var fileExt = Path.GetExtension(FileFullPath);
-        var fileName = Path.GetFileName(FileFullPath);
-        var folder = Path.GetDirectoryName(FileFullPath);
-
-        try
-        {
-            if (IsOn && fileExt == CommonString.DisableExt)
-            {
-                fileName = fileName.Replace(CommonString.DisableExt, "");
-                var newFile = Path.Combine(folder, fileName);
-                if (File.Exists(newFile))
-                {
-                    // 存在.addin文件时，直接删除当前的.disable文件
-                    File.Delete(FileFullPath);
-                }
-                else
-                {
-                    File.Move(FileFullPath, newFile);
-                }
-                FileFullPath = newFile;
-                AddinFileName = fileName;
-            }
-            else if (!IsOn && fileExt != CommonString.DisableExt)
-            {
-                fileName = fileName + CommonString.DisableExt;
-                var newFile = Path.Combine(folder, fileName);
-                if (File.Exists(newFile))
-                {
-                    // 存在旧的.disable文件时，直接删除旧的.disable文件
-                    File.Delete(newFile);
-                }
-                File.Move(FileFullPath, newFile);
-                FileFullPath = newFile;
-                AddinFileName = fileName;
-            }
-        }
-        catch (UnauthorizedAccessException)
-        {
-            MessageBox.Show("权限不足，请以管理员身份运行此程序。");
-            RevertIsOn();
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show($"修改文件失败: {ex.Message}");
-            RevertIsOn();
-        }
-    }
-
-    private void RevertIsOn()
-    {
-        _isUpdating = true;
-        IsOn = !IsOn;
-        _isUpdating = false;
-    }
-
+    /// <summary>
+    /// 文件完整路径
+    /// </summary>
     public string FileFullPath { get; set; }
 
-    private void OpenFolder()
+    /// <summary>
+    /// 插件完整信息（用于详情显示）
+    /// </summary>
+    public AddinFullInfo FullInfo { get; private set; }
+
+    /// <summary>
+    /// 加载完整插件信息
+    /// </summary>
+    public AddinFullInfo LoadFullInfo()
     {
-        var folder = Path.GetDirectoryName(FileFullPath);
-        if (!Directory.Exists(folder)) return;
-        
+        if (FullInfo != null) return FullInfo;
+        if (!File.Exists(FileFullPath)) return null;
+
         try
         {
-            var psi = new ProcessStartInfo
+            var doc = XDocument.Load(FileFullPath);
+            var addinElement = doc.Element("RevitAddIns");
+            if (addinElement == null) return null;
+
+            var appElement = addinElement.Element("AddIn");
+            if (appElement == null) return null;
+
+            FullInfo = new AddinFullInfo
             {
-                FileName = folder,
-                UseShellExecute = true,
+                Name = appElement.Element("Name")?.Value?.Trim() ?? "",
+                Assembly = appElement.Element("Assembly")?.Value?.Trim() ?? "",
+                FullClassName = appElement.Element("FullClassName")?.Value?.Trim() ?? "",
+                VendorId = appElement.Element("VendorId")?.Value?.Trim() ?? "",
+                VendorDescription = appElement.Element("VendorDescription")?.Value?.Trim() ?? "",
+                AddinType = appElement.Attribute("Type")?.Value ?? "",
             };
-            Process.Start(psi);
+            return FullInfo;
         }
-        catch (Exception ex)
+        catch
         {
-            MessageBox.Show($"无法打开目录: {ex.Message}");
+            return null;
         }
     }
+}
+
+/// <summary>
+/// 插件完整信息
+/// </summary>
+public class AddinFullInfo
+{
+    public string Name { get; set; }
+    public string Assembly { get; set; }
+    public string FullClassName { get; set; }
+    public string VendorId { get; set; }
+    public string VendorDescription { get; set; }
+    public string AddinType { get; set; }
 }

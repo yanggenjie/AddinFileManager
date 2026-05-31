@@ -1,30 +1,24 @@
+using AddinFileManager.UI.Model;
 using AddinFileManager.UI.View;
 using AddinFileManager.UI.ViewModel;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace AddinFileManager;
 
-/// <summary>
-/// Interaction logic for MainWindow.xaml
-/// </summary>
 public partial class MainWindow : Window
 {
+    private MainViewModel _viewModel;
+
     public MainWindow()
     {
         InitializeComponent();
-        this.DataContext = new MainViewModel();
-        
+        _viewModel = new MainViewModel();
+        DataContext = _viewModel;
+
         var version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
-        this.Title = $"Revit插件管理器 v{version.Major}.{version.Minor}.{version.Build} - Copyright © RyzeYang 2026";
+        Title = $"Revit插件管理器 v{version.Major}.{version.Minor}.{version.Build} - Copyright © RyzeYang 2026";
     }
 
     private void SettingsButton_Click(object sender, RoutedEventArgs e)
@@ -33,19 +27,52 @@ public partial class MainWindow : Window
         settingsWindow.Owner = this;
         if (settingsWindow.ShowDialog() == true)
         {
-            if (this.DataContext is MainViewModel vm)
-            {
-                var previousSelected = vm.SelectedVersion;
-                vm.LoadVersions();
-                if (vm.RevitVersionItems.Contains(previousSelected))
-                {
-                    vm.SelectedVersion = previousSelected;
-                }
-                else if (vm.RevitVersionItems.Count > 0)
-                {
-                    vm.SelectedVersion = vm.RevitVersionItems[vm.RevitVersionItems.Count - 1];
-                }
-            }
+            var previousSelected = _viewModel.SelectedVersion;
+            _viewModel.ReloadVersions(previousSelected);
         }
+    }
+
+    private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        _viewModel.ApplyFilter();
+    }
+
+    private void AddinDataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+    {
+        // 直接使用当前选中项
+        if (AddinDataGrid.SelectedItem is AddinInfoModel model)
+        {
+            ShowAddinDetails(model);
+            e.Handled = true;
+        }
+    }
+
+    private static T FindVisualParent<T>(DependencyObject child) where T : DependencyObject
+    {
+        var parent = System.Windows.Media.VisualTreeHelper.GetParent(child);
+        while (parent != null)
+        {
+            if (parent is T typed)
+                return typed;
+            parent = System.Windows.Media.VisualTreeHelper.GetParent(parent);
+        }
+        return null;
+    }
+
+    private void MainWindow_KeyDown(object sender, KeyEventArgs e)
+    {
+        // Delete 键删除选中项
+        if (e.Key == Key.Delete && AddinDataGrid.SelectedItem is AddinInfoModel model)
+        {
+            _viewModel.DeleteAddinCommand.Execute(model);
+            e.Handled = true;
+        }
+    }
+
+    private void ShowAddinDetails(AddinInfoModel model)
+    {
+        var detailsWindow = new AddinDetailsWindow(model);
+        detailsWindow.Owner = this;
+        detailsWindow.ShowDialog();
     }
 }

@@ -1,4 +1,6 @@
+using AddinFileManager.Services;
 using System.Windows;
+using System.Windows.Media;
 
 namespace AddinFileManager.UI.View
 {
@@ -15,23 +17,23 @@ namespace AddinFileManager.UI.View
             {
                 case MessageType.Error:
                     IconTextBlock.Text = ""; // Error icon
-                    IconTextBlock.Foreground = System.Windows.Media.Brushes.Red;
-                    OkButton.Background = System.Windows.Media.Brushes.Red;
+                    IconTextBlock.Foreground = Brushes.Red;
+                    OkButton.Background = Brushes.Red;
                     break;
                 case MessageType.Warning:
                     IconTextBlock.Text = ""; // Warning icon
-                    IconTextBlock.Foreground = System.Windows.Media.Brushes.Orange;
-                    OkButton.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 140, 0));
+                    IconTextBlock.Foreground = Brushes.Orange;
+                    OkButton.Background = new SolidColorBrush(Color.FromRgb(255, 140, 0));
                     break;
                 case MessageType.Success:
                     IconTextBlock.Text = ""; // Checkmark icon
-                    IconTextBlock.Foreground = System.Windows.Media.Brushes.Green;
-                    OkButton.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0, 150, 0));
+                    IconTextBlock.Foreground = Brushes.Green;
+                    OkButton.Background = new SolidColorBrush(Color.FromRgb(0, 150, 0));
                     break;
                 default:
                     IconTextBlock.Text = ""; // Info icon
-                    IconTextBlock.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0, 120, 215));
-                    OkButton.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0, 120, 215));
+                    IconTextBlock.Foreground = new SolidColorBrush(Color.FromRgb(0, 120, 215));
+                    OkButton.Background = new SolidColorBrush(Color.FromRgb(0, 120, 215));
                     break;
             }
         }
@@ -48,13 +50,5 @@ namespace AddinFileManager.UI.View
                 DragMove();
             }
         }
-    }
-
-    public enum MessageType
-    {
-        Info,
-        Success,
-        Warning,
-        Error
     }
 }

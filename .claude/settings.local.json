@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(dotnet build *)",
+      "PowerShell(Start-Process \"D:\\\\A_DataBases\\\\Source\\\\01MyGitea\\\\AddinFileManager\\\\source\\\\bin\\\\AddinFileManager\\\\net472\\\\AddinFileManager.exe\")"
+    ]
+  }
+}
