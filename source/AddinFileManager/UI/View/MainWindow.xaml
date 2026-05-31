@@ -363,8 +363,7 @@
                 <!-- 右键菜单 -->
                 <DataGrid.ContextMenu>
                     <ContextMenu>
-                        <MenuItem Header="查看详情" Command="{Binding ShowDetailsCommand}"
-                                  CommandParameter="{Binding PlacementTarget.SelectedItem, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
+                        <MenuItem Header="查看详情" Click="ContextMenu_ViewDetails_Click">
                             <MenuItem.Icon>
                                 <iconPacks:PackIconMaterial Kind="InformationOutline" Width="16" Height="16"/>
                             </MenuItem.Icon>

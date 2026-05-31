@@ -57,16 +57,12 @@ public partial class MainWindow : Window
         }
     }
 
-    private static T FindVisualParent<T>(DependencyObject child) where T : DependencyObject
+    private void ContextMenu_ViewDetails_Click(object sender, RoutedEventArgs e)
     {
-        var parent = System.Windows.Media.VisualTreeHelper.GetParent(child);
-        while (parent != null)
+        if (AddinDataGrid.SelectedItem is AddinInfoModel model)
         {
-            if (parent is T typed)
-                return typed;
-            parent = System.Windows.Media.VisualTreeHelper.GetParent(parent);
+            ShowAddinDetails(model);
         }
-        return null;
     }
 
     private void MainWindow_KeyDown(object sender, KeyEventArgs e)
@@ -81,7 +77,7 @@ public partial class MainWindow : Window
 
     private void ShowAddinDetails(AddinInfoModel model)
     {
-        var detailsWindow = new AddinDetailsWindow(model);
+        var detailsWindow = new AddinDetailsWindow(model, _viewModel);
         detailsWindow.Owner = this;
         detailsWindow.ShowDialog();
     }

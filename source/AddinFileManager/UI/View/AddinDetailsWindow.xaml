@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
         xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
-        Title="插件详情" Height="400" Width="500"
+        Title="插件详情" Height="500" Width="550"
         WindowStartupLocation="CenterOwner" ResizeMode="NoResize"
         Background="White" FontSize="14">
     <Window.Resources>
@@ -17,6 +17,12 @@
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="TextWrapping" Value="Wrap"/>
             <Setter Property="MaxHeight" Value="60"/>
+        </Style>
+        <Style x:Key="EditTextBox" TargetType="TextBox" BasedOn="{StaticResource MahApps.Styles.TextBox}">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="6,4"/>
+            <Setter Property="BorderBrush" Value="#E0E0E0"/>
+            <Setter Property="Background" Value="#FAFAFA"/>
         </Style>
     </Window.Resources>
 
@@ -70,7 +76,11 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" Text="状态:" Style="{StaticResource InfoLabel}"/>
-                        <TextBlock x:Name="StatusText" Grid.Column="1" Style="{StaticResource InfoValue}"/>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal">
+                            <TextBlock x:Name="StatusText" Style="{StaticResource InfoValue}"/>
+                            <mah:ToggleSwitch x:Name="StatusToggle" Margin="10,0,0,0"
+                                              OnContent="" OffContent="" FontSize="12"/>
+                        </StackPanel>
                     </Grid>
 
                     <Grid Margin="0,0,0,10">
@@ -93,7 +103,7 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" Text="名称:" Style="{StaticResource InfoLabel}"/>
-                        <TextBlock x:Name="NameText" Grid.Column="1" Style="{StaticResource InfoValue}"/>
+                        <TextBox x:Name="NameTextBox" Grid.Column="1" Style="{StaticResource EditTextBox}"/>
                     </Grid>
 
                     <Grid Margin="0,0,0,10">
@@ -111,7 +121,7 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" Text="程序集:" Style="{StaticResource InfoLabel}"/>
-                        <TextBlock x:Name="AssemblyText" Grid.Column="1" Style="{StaticResource InfoValue}" ToolTip="{Binding Text, RelativeSource={RelativeSource Self}}"/>
+                        <TextBox x:Name="AssemblyTextBox" Grid.Column="1" Style="{StaticResource EditTextBox}" ToolTip="{Binding Text, RelativeSource={RelativeSource Self}}"/>
                     </Grid>
 
                     <Grid Margin="0,0,0,10">
@@ -120,7 +130,7 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" Text="类名:" Style="{StaticResource InfoLabel}"/>
-                        <TextBlock x:Name="ClassNameText" Grid.Column="1" Style="{StaticResource InfoValue}" ToolTip="{Binding Text, RelativeSource={RelativeSource Self}}"/>
+                        <TextBox x:Name="ClassNameTextBox" Grid.Column="1" Style="{StaticResource EditTextBox}" ToolTip="{Binding Text, RelativeSource={RelativeSource Self}}"/>
                     </Grid>
 
                     <Grid Margin="0,0,0,10">
@@ -129,7 +139,7 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" Text="供应商ID:" Style="{StaticResource InfoLabel}"/>
-                        <TextBlock x:Name="VendorIdText" Grid.Column="1" Style="{StaticResource InfoValue}"/>
+                        <TextBox x:Name="VendorIdTextBox" Grid.Column="1" Style="{StaticResource EditTextBox}"/>
                     </Grid>
 
                     <Grid Margin="0,0,0,10">
@@ -138,7 +148,7 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" Text="供应商描述:" Style="{StaticResource InfoLabel}"/>
-                        <TextBlock x:Name="VendorDescText" Grid.Column="1" Style="{StaticResource InfoValue}"/>
+                        <TextBox x:Name="VendorDescTextBox" Grid.Column="1" Style="{StaticResource EditTextBox}" TextWrapping="Wrap" AcceptsReturn="True" Height="50" VerticalScrollBarVisibility="Auto"/>
                     </Grid>
                 </StackPanel>
             </ScrollViewer>
@@ -148,8 +158,12 @@
                 <Button Content="打开目录" Width="90" Height="32" Margin="0,0,10,0"
                         Click="OpenFolder_Click" Cursor="Hand"
                         mah:ControlsHelper.CornerRadius="4"/>
-                <Button Content="关闭" Width="90" Height="32"
-                        Click="Close_Click" Background="#1976D2" Foreground="White"
+                <Button Content="保存" Width="90" Height="32" Margin="0,0,10,0"
+                        Click="Save_Click" Background="#43A047" Foreground="White"
+                        BorderThickness="0" Cursor="Hand"
+                        mah:ControlsHelper.CornerRadius="4"/>
+                <Button Content="取消" Width="90" Height="32"
+                        Click="Cancel_Click" Background="#9E9E9E" Foreground="White"
                         BorderThickness="0" Cursor="Hand"
                         mah:ControlsHelper.CornerRadius="4"/>
             </StackPanel>
