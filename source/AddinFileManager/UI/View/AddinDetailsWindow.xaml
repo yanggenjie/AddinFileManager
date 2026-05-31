@@ -3,8 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
         xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
-        Title="插件详情" Height="500" Width="550"
-        WindowStartupLocation="CenterOwner" ResizeMode="NoResize"
+        Title="插件详情" Height="550" Width="550"
+        WindowStartupLocation="CenterOwner" ResizeMode="CanResize"
         Background="White" FontSize="14">
     <Window.Resources>
         <Style x:Key="InfoLabel" TargetType="TextBlock">
@@ -17,12 +17,6 @@
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="TextWrapping" Value="Wrap"/>
             <Setter Property="MaxHeight" Value="60"/>
-        </Style>
-        <Style x:Key="EditTextBox" TargetType="TextBox" BasedOn="{StaticResource MahApps.Styles.TextBox}">
-            <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="Padding" Value="6,4"/>
-            <Setter Property="BorderBrush" Value="#E0E0E0"/>
-            <Setter Property="Background" Value="#FAFAFA"/>
         </Style>
     </Window.Resources>
 
@@ -54,7 +48,7 @@
 
                     <Grid Margin="0,0,0,10">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="120"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" Text="文件名:" Style="{StaticResource InfoLabel}"/>
@@ -63,7 +57,7 @@
 
                     <Grid Margin="0,0,0,10">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="120"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" Text="安装位置:" Style="{StaticResource InfoLabel}"/>
@@ -72,7 +66,7 @@
 
                     <Grid Margin="0,0,0,10">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="120"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" Text="状态:" Style="{StaticResource InfoLabel}"/>
@@ -85,7 +79,7 @@
 
                     <Grid Margin="0,0,0,10">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="120"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" Text="完整路径:" Style="{StaticResource InfoLabel}"/>
@@ -94,62 +88,10 @@
 
                     <Separator Margin="0,15,0,15" Background="#E0E0E0"/>
 
-                    <!-- 插件详情 -->
+                    <!-- XML字段（动态生成） -->
                     <TextBlock Text="插件信息" FontSize="14" FontWeight="SemiBold" Foreground="#1976D2" Margin="0,0,0,15"/>
 
-                    <Grid Margin="0,0,0,10">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="100"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="Name:" Style="{StaticResource InfoLabel}"/>
-                        <TextBox x:Name="NameTextBox" Grid.Column="1" Style="{StaticResource EditTextBox}"/>
-                    </Grid>
-
-                    <Grid Margin="0,0,0,10">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="100"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="AddInType:" Style="{StaticResource InfoLabel}"/>
-                        <TextBlock x:Name="TypeText" Grid.Column="1" Style="{StaticResource InfoValue}"/>
-                    </Grid>
-
-                    <Grid Margin="0,0,0,10">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="100"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="Assembly:" Style="{StaticResource InfoLabel}"/>
-                        <TextBox x:Name="AssemblyTextBox" Grid.Column="1" Style="{StaticResource EditTextBox}" ToolTip="{Binding Text, RelativeSource={RelativeSource Self}}"/>
-                    </Grid>
-
-                    <Grid Margin="0,0,0,10">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="100"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="FullClassName:" Style="{StaticResource InfoLabel}"/>
-                        <TextBox x:Name="ClassNameTextBox" Grid.Column="1" Style="{StaticResource EditTextBox}" ToolTip="{Binding Text, RelativeSource={RelativeSource Self}}"/>
-                    </Grid>
-
-                    <Grid Margin="0,0,0,10">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="100"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="VendorId:" Style="{StaticResource InfoLabel}"/>
-                        <TextBox x:Name="VendorIdTextBox" Grid.Column="1" Style="{StaticResource EditTextBox}"/>
-                    </Grid>
-
-                    <Grid Margin="0,0,0,10">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="100"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="VendorDescription:" Style="{StaticResource InfoLabel}"/>
-                        <TextBox x:Name="VendorDescTextBox" Grid.Column="1" Style="{StaticResource EditTextBox}" TextWrapping="Wrap" AcceptsReturn="True" Height="50" VerticalScrollBarVisibility="Auto"/>
-                    </Grid>
+                    <StackPanel x:Name="FieldsPanel"/>
                 </StackPanel>
             </ScrollViewer>
 

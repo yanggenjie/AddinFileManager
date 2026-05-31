@@ -1,10 +1,11 @@
-using AddinFileManager.Services;
 using AddinFileManager.UI.Model;
 using AddinFileManager.UI.ViewModel;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
-using System.Windows.Media;
+using System.Windows.Controls;
+using System.Xml.Linq;
 
 namespace AddinFileManager.UI.View;
 
@@ -12,8 +13,9 @@ public partial class AddinDetailsWindow : Window
 {
     private readonly AddinInfoModel _model;
     private readonly MainViewModel _viewModel;
-    private AddinFullInfo _originalInfo;
     private readonly bool _originalIsOn;
+    private readonly string _originalXmlContent;
+    private Dictionary<string, string> _fieldValues = new();
 
     public AddinDetailsWindow(AddinInfoModel model, MainViewModel viewModel = null)
     {
@@ -21,6 +23,9 @@ public partial class AddinDetailsWindow : Window
         _model = model;
         _viewModel = viewModel;
         _originalIsOn = model.IsOn;
+        _originalXmlContent = File.Exists(_model.FileFullPath)
+            ? File.ReadAllText(_model.FileFullPath)
+            : string.Empty;
         LoadData();
     }
 
@@ -36,16 +41,83 @@ public partial class AddinDetailsWindow : Window
         StatusToggle.IsOn = _model.IsOn;
         StatusToggle.Toggled += (s, e) => UpdateStatusDisplay(StatusToggle.IsOn);
 
-        var fullInfo = _model.LoadFullInfo();
-        if (fullInfo != null)
+        // 动态解析XML并生成字段
+        ParseAndGenerateFields();
+    }
+
+    private void ParseAndGenerateFields()
+    {
+        if (string.IsNullOrEmpty(_originalXmlContent)) return;
+
+        try
         {
-            _originalInfo = fullInfo;
-            NameTextBox.Text = fullInfo.Name ?? string.Empty;
-            TypeText.Text = fullInfo.AddinType ?? string.Empty;
-            AssemblyTextBox.Text = fullInfo.Assembly ?? string.Empty;
-            ClassNameTextBox.Text = fullInfo.FullClassName ?? string.Empty;
-            VendorIdTextBox.Text = fullInfo.VendorId ?? string.Empty;
-            VendorDescTextBox.Text = fullInfo.VendorDescription ?? string.Empty;
+            var doc = XDocument.Parse(_originalXmlContent);
+            var addinElement = doc.Root?.Element("AddIn") ?? doc.Root;
+
+            if (addinElement == null) return;
+
+            foreach (var element in addinElement.Elements())
+            {
+                var name = element.Name.LocalName;
+                var value = element.Value ?? string.Empty;
+                _fieldValues[name] = value;
+
+                // 创建标签和输入框
+                var grid = new Grid { Margin = new Thickness(0, 0, 0, 10) };
+                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(120) });
+                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+
+                // 标签
+                var label = new TextBlock
+                {
+                    Text = name + ":",
+                    Foreground = new System.Windows.Media.SolidColorBrush(
+                        (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#666666")),
+                    FontWeight = FontWeights.Medium,
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+                Grid.SetColumn(label, 0);
+                grid.Children.Add(label);
+
+                // 输入框（某些字段只读）
+                var isReadOnly = name == "AddInType";
+                if (isReadOnly)
+                {
+                    var textBlock = new TextBlock
+                    {
+                        Text = value,
+                        Foreground = new System.Windows.Media.SolidColorBrush(
+                            (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#333333")),
+                        VerticalAlignment = VerticalAlignment.Center,
+                        TextWrapping = TextWrapping.Wrap
+                    };
+                    Grid.SetColumn(textBlock, 1);
+                    grid.Children.Add(textBlock);
+                }
+                else
+                {
+                    var textBox = new TextBox
+                    {
+                        Text = value,
+                        VerticalAlignment = VerticalAlignment.Center,
+                        Padding = new Thickness(6, 4, 6, 4),
+                        BorderBrush = new System.Windows.Media.SolidColorBrush(
+                            (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#E0E0E0")),
+                        Background = new System.Windows.Media.SolidColorBrush(
+                            (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#FAFAFA")),
+                        Tag = name // 保存字段名用于后续保存
+                    };
+                    textBox.ToolTip = new ToolTip { Content = value };
+                    Grid.SetColumn(textBox, 1);
+                    grid.Children.Add(textBox);
+                }
+
+                FieldsPanel.Children.Add(grid);
+            }
+        }
+        catch
+        {
+            // XML解析失败，忽略
         }
     }
 
@@ -53,8 +125,8 @@ public partial class AddinDetailsWindow : Window
     {
         StatusText.Text = isOn ? "已启用" : "已禁用";
         StatusText.Foreground = isOn
-            ? (Brush)new BrushConverter().ConvertFrom("#43A047")!
-            : (Brush)new BrushConverter().ConvertFrom("#E53935")!;
+            ? (System.Windows.Media.Brush)new System.Windows.Media.BrushConverter().ConvertFrom("#43A047")
+            : (System.Windows.Media.Brush)new System.Windows.Media.BrushConverter().ConvertFrom("#E53935");
     }
 
     private void OpenFolder_Click(object sender, RoutedEventArgs e)
@@ -83,61 +155,49 @@ public partial class AddinDetailsWindow : Window
         }
 
         // 保存插件信息到文件
-        SaveAddinInfo();
-
-        MessageBox.Show("保存成功", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
-        DialogResult = true;
-        Close();
+        if (SaveAddinInfo())
+        {
+            MessageBox.Show("保存成功", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+            DialogResult = true;
+            Close();
+        }
     }
 
-    private void SaveAddinInfo()
+    private bool SaveAddinInfo()
     {
-        if (_originalInfo == null) return;
-
         var filePath = _model.FileFullPath;
-        if (!File.Exists(filePath)) return;
+        if (!File.Exists(filePath)) return false;
 
         try
         {
-            var xmlContent = File.ReadAllText(filePath);
+            var xmlContent = _originalXmlContent;
 
-            // 更新 Name
-            if (!string.IsNullOrEmpty(NameTextBox.Text))
+            // 遍历所有输入框，更新XML内容
+            foreach (var child in FieldsPanel.Children)
             {
-                xmlContent = UpdateXmlTag(xmlContent, "Name", NameTextBox.Text);
-                _model.Remark = NameTextBox.Text;
+                if (child is Grid grid && grid.Children[1] is TextBox textBox)
+                {
+                    var fieldName = textBox.Tag?.ToString();
+                    if (!string.IsNullOrEmpty(fieldName) && !string.IsNullOrEmpty(textBox.Text))
+                    {
+                        xmlContent = UpdateXmlTag(xmlContent, fieldName, textBox.Text);
+
+                        // 如果是Name字段，同步更新模型
+                        if (fieldName == "Name")
+                        {
+                            _model.Remark = textBox.Text;
+                        }
+                    }
+                }
             }
-
-            // 更新 Assembly
-            if (!string.IsNullOrEmpty(AssemblyTextBox.Text))
-            {
-                xmlContent = UpdateXmlTag(xmlContent, "Assembly", AssemblyTextBox.Text);
-            }
-
-            // 更新 FullClassName
-            if (!string.IsNullOrEmpty(ClassNameTextBox.Text))
-            {
-                xmlContent = UpdateXmlTag(xmlContent, "FullClassName", ClassNameTextBox.Text);
-            }
-
-            // 更新 VendorId
-            xmlContent = UpdateXmlTag(xmlContent, "VendorId", VendorIdTextBox.Text);
-
-            // 更新 VendorDescription
-            xmlContent = UpdateXmlTag(xmlContent, "VendorDescription", VendorDescTextBox.Text);
 
             File.WriteAllText(filePath, xmlContent);
-
-            // 更新模型中的信息
-            _originalInfo.Name = NameTextBox.Text;
-            _originalInfo.Assembly = AssemblyTextBox.Text;
-            _originalInfo.FullClassName = ClassNameTextBox.Text;
-            _originalInfo.VendorId = VendorIdTextBox.Text;
-            _originalInfo.VendorDescription = VendorDescTextBox.Text;
+            return true;
         }
         catch
         {
             MessageBox.Show("保存文件失败，请检查文件权限", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+            return false;
         }
     }
 
@@ -153,7 +213,7 @@ public partial class AddinDetailsWindow : Window
         {
             var before = xml.Substring(0, startIndex + startTag.Length);
             var after = xml.Substring(endIndex);
-            return before + value + after;
+            return before + System.Security.SecurityElement.Escape(value) + after;
         }
 
         return xml;
