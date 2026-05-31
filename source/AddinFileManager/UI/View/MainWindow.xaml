@@ -279,11 +279,6 @@
                       Style="{StaticResource DataGridDefault}"
                       RowStyle="{StaticResource DataGridRowStyle}"
                       CellStyle="{StaticResource DataGridCellStyle}"
-                      AlternatingRowBackground="#F5F5F5"
-                      RowBackground="White"
-                      GridLinesVisibility="Horizontal"
-                      HorizontalGridLinesBrush="#E0E0E0"
-                      VerticalGridLinesBrush="Transparent"
                       MouseDoubleClick="AddinDataGrid_MouseDoubleClick">
                 <DataGrid.GroupStyle>
                     <GroupStyle ContainerStyle="{StaticResource GroupHeaderStyle}"/>
