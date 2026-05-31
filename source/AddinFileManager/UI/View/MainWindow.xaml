@@ -340,17 +340,17 @@
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
 
-                    <DataGridTemplateColumn Width="100" Header="操作">
+                    <DataGridTemplateColumn Width="Auto" Header="操作">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,2">
                                     <Button Content="打开" Style="{StaticResource RoundedButton}"
-                                            Width="45" Height="26" Margin="0,0,4,0" FontSize="12"
+                                            Padding="10,5" Margin="0,0,6,0" FontSize="12"
                                             Command="{Binding DataContext.OpenFolderCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
                                             CommandParameter="{Binding}"
                                             ToolTip="打开所在目录"/>
                                     <Button Content="删除" Style="{StaticResource DeleteButton}"
-                                            Width="45" Height="26" FontSize="12"
+                                            Padding="10,5" FontSize="12"
                                             Command="{Binding DataContext.DeleteAddinCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
                                             CommandParameter="{Binding}"
                                             ToolTip="删除插件"/>
