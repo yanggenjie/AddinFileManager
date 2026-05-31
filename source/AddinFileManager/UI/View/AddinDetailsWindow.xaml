@@ -102,7 +102,7 @@
                             <ColumnDefinition Width="100"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="名称:" Style="{StaticResource InfoLabel}"/>
+                        <TextBlock Grid.Column="0" Text="Name:" Style="{StaticResource InfoLabel}"/>
                         <TextBox x:Name="NameTextBox" Grid.Column="1" Style="{StaticResource EditTextBox}"/>
                     </Grid>
 
@@ -111,7 +111,7 @@
                             <ColumnDefinition Width="100"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="类型:" Style="{StaticResource InfoLabel}"/>
+                        <TextBlock Grid.Column="0" Text="AddInType:" Style="{StaticResource InfoLabel}"/>
                         <TextBlock x:Name="TypeText" Grid.Column="1" Style="{StaticResource InfoValue}"/>
                     </Grid>
 
@@ -120,7 +120,7 @@
                             <ColumnDefinition Width="100"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="程序集:" Style="{StaticResource InfoLabel}"/>
+                        <TextBlock Grid.Column="0" Text="Assembly:" Style="{StaticResource InfoLabel}"/>
                         <TextBox x:Name="AssemblyTextBox" Grid.Column="1" Style="{StaticResource EditTextBox}" ToolTip="{Binding Text, RelativeSource={RelativeSource Self}}"/>
                     </Grid>
 
@@ -129,7 +129,7 @@
                             <ColumnDefinition Width="100"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="类名:" Style="{StaticResource InfoLabel}"/>
+                        <TextBlock Grid.Column="0" Text="FullClassName:" Style="{StaticResource InfoLabel}"/>
                         <TextBox x:Name="ClassNameTextBox" Grid.Column="1" Style="{StaticResource EditTextBox}" ToolTip="{Binding Text, RelativeSource={RelativeSource Self}}"/>
                     </Grid>
 
@@ -138,7 +138,7 @@
                             <ColumnDefinition Width="100"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="供应商ID:" Style="{StaticResource InfoLabel}"/>
+                        <TextBlock Grid.Column="0" Text="VendorId:" Style="{StaticResource InfoLabel}"/>
                         <TextBox x:Name="VendorIdTextBox" Grid.Column="1" Style="{StaticResource EditTextBox}"/>
                     </Grid>
 
@@ -147,7 +147,7 @@
                             <ColumnDefinition Width="100"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Column="0" Text="供应商描述:" Style="{StaticResource InfoLabel}"/>
+                        <TextBlock Grid.Column="0" Text="VendorDescription:" Style="{StaticResource InfoLabel}"/>
                         <TextBox x:Name="VendorDescTextBox" Grid.Column="1" Style="{StaticResource EditTextBox}" TextWrapping="Wrap" AcceptsReturn="True" Height="50" VerticalScrollBarVisibility="Auto"/>
                     </Grid>
                 </StackPanel>
