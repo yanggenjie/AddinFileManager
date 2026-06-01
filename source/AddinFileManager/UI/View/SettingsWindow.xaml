@@ -284,6 +284,12 @@
                         <TextBlock x:Name="CopyrightTextBlock" Text="© 2024 RyzeYang"/>
                     </StackPanel>
 
+                    <!-- 版本检测 -->
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,15">
+                        <Button x:Name="CheckUpdateButton" Content="检查更新" Padding="12,6" Click="CheckUpdateButton_Click" Margin="0,0,10,0"/>
+                        <TextBlock x:Name="UpdateStatusTextBlock" VerticalAlignment="Center" Foreground="#888"/>
+                    </StackPanel>
+
                     <!-- 更新日志链接 -->
                     <Border Background="#F5F5F5" CornerRadius="8" Padding="20,12" Cursor="Hand" MouseLeftButtonDown="UpdateLogBorder_MouseLeftButtonDown">
                         <StackPanel Orientation="Horizontal">

@@ -1,7 +1,12 @@
 using AddinFileManager.Common;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Windows;
@@ -14,6 +19,8 @@ namespace AddinFileManager.UI.View
     {
         private static readonly Regex DigitsOnlyRegex = new(@"^\d+$", RegexOptions.Compiled);
         private static readonly Regex FourDigitYearRegex = new(@"^\d{4}$", RegexOptions.Compiled);
+        private const string RepoOwner = "yanggenjie";
+        private const string RepoName = "AddinFileManager";
 
         public ObservableCollection<string> Versions { get; set; }
 
@@ -106,11 +113,82 @@ namespace AddinFileManager.UI.View
 
         private static void OpenUpdateLogUrl()
         {
-            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+            Process.Start(new ProcessStartInfo
             {
-                FileName = "https://yanggenjie.cn/MySoft/RevitAddinfileManager.html",
+                FileName = $"https://github.com/{RepoOwner}/{RepoName}/releases",
                 UseShellExecute = true
             });
+        }
+
+        private async void CheckUpdateButton_Click(object sender, RoutedEventArgs e)
+        {
+            CheckUpdateButton.IsEnabled = false;
+            UpdateStatusTextBlock.Text = "正在检查...";
+            UpdateStatusTextBlock.Foreground = FindResource("MahApps.Brushes.Gray3") as System.Windows.Media.Brush;
+
+            try
+            {
+                using var httpClient = new HttpClient();
+                httpClient.Timeout = TimeSpan.FromSeconds(10);
+                httpClient.DefaultRequestHeaders.Add("User-Agent", "AddinFileManager");
+
+                var response = await httpClient.GetStringAsync($"https://api.github.com/repos/{RepoOwner}/{RepoName}/releases/latest");
+                var json = JObject.Parse(response);
+
+                var latestTag = json["tag_name"]?.ToString();
+                var latestVersion = latestTag?.TrimStart('v');
+                var releaseUrl = json["html_url"]?.ToString();
+
+                var currentVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
+
+                if (CompareVersions(latestVersion, currentVersion) > 0)
+                {
+                    UpdateStatusTextBlock.Text = $"发现新版本: v{latestVersion}";
+                    UpdateStatusTextBlock.Foreground = FindResource("MahApps.Brushes.Accent") as System.Windows.Media.Brush;
+
+                    var result = MessageBox.Show(
+                        $"当前版本: v{currentVersion}\n最新版本: v{latestVersion}\n\n是否前往下载？",
+                        "发现新版本",
+                        MessageBoxButton.YesNo,
+                        MessageBoxImage.Information);
+
+                    if (result == MessageBoxResult.Yes && !string.IsNullOrEmpty(releaseUrl))
+                    {
+                        Process.Start(new ProcessStartInfo { FileName = releaseUrl, UseShellExecute = true });
+                    }
+                }
+                else
+                {
+                    UpdateStatusTextBlock.Text = "已是最新版本";
+                    UpdateStatusTextBlock.Foreground = System.Windows.Media.Brushes.Green;
+                }
+            }
+            catch (Exception ex)
+            {
+                UpdateStatusTextBlock.Text = "检查更新失败";
+                UpdateStatusTextBlock.Foreground = System.Windows.Media.Brushes.Red;
+                MessageBox.Show($"检查更新失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+            finally
+            {
+                CheckUpdateButton.IsEnabled = true;
+            }
+        }
+
+        private static int CompareVersions(string v1, string v2)
+        {
+            var parts1 = v1?.Split('.') ?? Array.Empty<string>();
+            var parts2 = v2?.Split('.') ?? Array.Empty<string>();
+
+            for (int i = 0; i < Math.Max(parts1.Length, parts2.Length); i++)
+            {
+                var p1 = i < parts1.Length && int.TryParse(parts1[i], out var n1) ? n1 : 0;
+                var p2 = i < parts2.Length && int.TryParse(parts2[i], out var n2) ? n2 : 0;
+
+                if (p1 > p2) return 1;
+                if (p1 < p2) return -1;
+            }
+            return 0;
         }
 
         private void AddButton_Click(object sender, RoutedEventArgs e)
