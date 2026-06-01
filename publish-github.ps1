@@ -20,8 +20,23 @@ if ($content -match $regex) {
     $vMinor = [int]$matches[2]
     $vBuild = [int]$matches[3]
     $vRev = [int]$matches[4]
-    $version = "$vMajor.$vMinor.$vBuild.$vRev"
-    Write-Host "Current Version: $version" -ForegroundColor Cyan
+
+    $oldVersion = "$vMajor.$vMinor.$vBuild.$vRev"
+    Write-Host "Current Version: $oldVersion" -ForegroundColor Cyan
+
+    # Auto increment build number and reset revision
+    $vBuild++
+    $vRev = 0
+
+    $newVersion = "$vMajor.$vMinor.$vBuild.$vRev"
+    Write-Host "New Version:     $newVersion" -ForegroundColor Green
+
+    # Update version in AssemblyInfo.cs
+    $content = $content -replace '\[assembly:\s*AssemblyVersion\(".*?"\)\]', "[assembly: AssemblyVersion(`"$newVersion`")]"
+    $content = $content -replace '\[assembly:\s*AssemblyFileVersion\(".*?"\)\]', "[assembly: AssemblyFileVersion(`"$newVersion`")]"
+    Set-Content -Path $assemblyInfoPath -Value $content -NoNewline
+
+    $version = $newVersion
 } else {
     Write-Error "Could not parse version from AssemblyInfo.cs"
     exit 1
