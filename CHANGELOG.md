@@ -1,14 +1,99 @@
-## 1.0.5
+# 更新日志
 
-- Added custom confirm dialog to replace MessageBox
-- Added update log hyperlink in settings, replacing static check update button
-- Updated supported Revit versions, removed deprecated versions
-- Fixed column header display in main window
-- Updated copyright year to 2026
+All notable changes to this project will be documented in this file.
 
-## 1.0.4
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-- Added delete functionality for add-in files with confirmation prompt
-- Reworked settings UI and added about tab with assembly info display
-- Added publish.ps1 automation script for version update and build
-- Added run.ps1 helper script
+## [1.0.7.0] - 2026-06-01
+
+### 新增
+- 设置窗口增加 GitHub Release 版本检查功能
+- 添加 GitHub Release 自动发布脚本
+
+### 修复
+- 消息框窗口现在支持调整大小
+
+### 优化
+- 代码图谱配置
+
+---
+
+## [1.0.6.0] - 2026-05-??
+
+### 新增
+- 主题切换功能（浅色/深色主题）
+
+### 修复
+- 修复主题切换后 DataGrid 样式不更新问题
+
+### 优化
+- 详情窗口动态解析 XML 字段
+- 详情窗口保留 XML 原始字段名
+- 详情窗口支持编辑保存功能
+
+---
+
+## [1.0.5.0] - 2026-04-??
+
+### 新增
+- 添加中英文双语更新日志
+
+### 修复
+- 修复双击分组头部弹出详情窗口问题
+- 修复操作按钮尺寸问题
+
+### 优化
+- 重写 DataGrid 行/单元格样式，修复选中效果
+- 优化 DataGrid 分组样式和选中效果
+- 全面优化界面交互体验和视觉效果
+- 代码质量和效率优化
+
+---
+
+## [1.0.4.0] - 2026-02-??
+
+### 新增
+- Settings 窗口重构，增加关于信息显示
+- 添加关于面板（版本信息、更新时间、检查更新按钮）
+- 添加发布自动化脚本 publish.ps1
+- 更新支持的 Revit 版本列表
+- 替换 MessageBox 为自定义确认对话框
+
+### 修复
+- 修复更新日志链接显示
+- 修复列标题显示问题
+- 优化窗口标题动态显示
+
+---
+
+## [1.0.3.0] - 2026-01-??
+
+### 新增
+- 设置窗口 UI 重构
+
+---
+
+## [1.0.2.0] - 2025-12-??
+
+### 新增
+- 插件删除功能（带确认对话框）
+
+---
+
+## [1.0.1.0] - 2025-11-??
+
+### 新增
+- 初始版本
+- 插件启用/禁用功能
+- 批量操作功能
+- 搜索过滤功能
+- 多版本 Revit 支持
+- 撤销功能
+- 插件详情查看
+- 右键菜单操作
+- 配置文件管理
+
+---
+
+*历史版本信息待补充完整...*
