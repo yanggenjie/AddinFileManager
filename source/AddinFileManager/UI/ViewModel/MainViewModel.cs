@@ -23,6 +23,7 @@ public class MainViewModel
     private ICommand _refreshCommand;
     private ICommand _undoCommand;
     private ICommand _toggleAddinCommand;
+    private ICommand _batchDeleteCommand;
     private ICommand _deleteAddinCommand;
     private ICommand _openFolderCommand;
     private ICommand _showDetailsCommand;
@@ -120,6 +121,10 @@ public class MainViewModel
     public ICommand BatchDisableCommand => _batchDisableCommand ??= new RelayCommand(
         _ => BatchToggle(false),
         _ => AddinCollectionView.Cast<AddinInfoModel>().Any(item => item.IsSelected && item.IsOn));
+
+    public ICommand BatchDeleteCommand => _batchDeleteCommand ??= new RelayCommand(
+        _ => BatchDelete(),
+        _ => AddinCollectionView.Cast<AddinInfoModel>().Any(item => item.IsSelected));
 
     public ICommand RefreshCommand => _refreshCommand ??= new RelayCommand(_ => Refresh());
 
@@ -314,6 +319,41 @@ public class MainViewModel
         }
     }
 
+    private void BatchDelete()
+    {
+        var selectedItems = AddinCollectionView.Cast<AddinInfoModel>()
+            .Where(x => x.IsSelected)
+            .ToList();
+
+        if (!selectedItems.Any()) return;
+
+        var names = string.Join("\n• ", selectedItems.Select(i => i.AddinFileName));
+        if (!_dialogService.ShowConfirm($"确定要删除以下 {selectedItems.Count} 个插件文件吗？\n\n• {names}\n\n删除后将无法恢复！", "批量删除确认"))
+            return;
+
+        var successCount = 0;
+        foreach (var item in selectedItems)
+        {
+            try
+            {
+                RecordOperation(item);
+                _addinFileService.DeleteAddin(item);
+                AddinFileItems.Remove(item);
+                successCount++;
+            }
+            catch (Exception ex)
+            {
+                _historyService.RemoveLastOperation();
+                _dialogService.ShowError($"删除 {item.AddinFileName} 失败: {ex.Message}");
+            }
+        }
+
+        UpdateVersionCounts();
+        StatusMessage = successCount == selectedItems.Count
+            ? $"已批量删除 {successCount} 个插件"
+            : $"成功删除 {successCount}/{selectedItems.Count} 个插件";
+    }
+
     private void DeleteAddin(AddinInfoModel item)
     {
         if (item == null) return;
@@ -324,6 +364,7 @@ public class MainViewModel
         try
         {
             RecordOperation(item);
+            item.LoadFullInfo();
             _addinFileService.DeleteAddin(item);
             AddinFileItems.Remove(item);
             StatusMessage = $"已删除 {item.Remark}";
