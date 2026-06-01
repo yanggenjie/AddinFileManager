@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="Confirm" MinHeight="180" MinWidth="380" MaxHeight="500" MaxWidth="600" SizeToContent="WidthAndHeight"
         WindowStyle="None" AllowsTransparency="True" Background="Transparent"
-        WindowStartupLocation="CenterOwner" ResizeMode="NoResize" Topmost="True">
+        WindowStartupLocation="CenterOwner" ResizeMode="CanResize" Topmost="True">
     <Border Background="White" CornerRadius="6" BorderBrush="#E0E0E0" BorderThickness="1" Margin="10">
         <Border.Effect>
             <DropShadowEffect Color="Black" Opacity="0.15" BlurRadius="15" ShadowDepth="0"/>
