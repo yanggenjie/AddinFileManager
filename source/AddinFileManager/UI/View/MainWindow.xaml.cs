@@ -40,7 +40,6 @@ public partial class MainWindow : Window
 
     private void AddinDataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
     {
-        // 检查点击的是否是数据行（而非分组头部）
         var hit = e.OriginalSource as DependencyObject;
         while (hit != null)
         {
@@ -50,9 +49,6 @@ public partial class MainWindow : Window
                 e.Handled = true;
                 return;
             }
-            // 如果遇到 Expander，说明点击的是分组头部，忽略
-            if (hit is Expander)
-                return;
             hit = System.Windows.Media.VisualTreeHelper.GetParent(hit);
         }
     }

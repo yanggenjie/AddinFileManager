@@ -136,44 +136,6 @@
             <Setter Property="HorizontalContentAlignment" Value="Center"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
-
-        <!-- 分组头部样式 -->
-        <Style x:Key="GroupHeaderStyle" TargetType="GroupItem">
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="GroupItem">
-                        <Expander IsExpanded="True"
-                                  Background="{DynamicResource MahApps.Brushes.Gray10}"
-                                  BorderBrush="{DynamicResource MahApps.Brushes.Border.NonActive}"
-                                  BorderThickness="0,0,0,1"
-                                  Margin="0,0,0,2">
-                            <Expander.Style>
-                                <Style TargetType="Expander" BasedOn="{StaticResource MahApps.Styles.Expander}">
-                                    <Style.Triggers>
-                                        <Trigger Property="IsMouseOver" Value="True">
-                                            <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.Gray9}"/>
-                                        </Trigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Expander.Style>
-                            <Expander.Header>
-                                <StackPanel Orientation="Horizontal" Margin="8,10">
-                                    <Border Background="{DynamicResource MahApps.Brushes.Gray9}" CornerRadius="4" Padding="6,4" Margin="0,0,10,0">
-                                        <iconPacks:PackIconMaterial Kind="FolderOutline" Width="16" Height="16"
-                                                                    Foreground="{DynamicResource MahApps.Brushes.Accent}" VerticalAlignment="Center"/>
-                                    </Border>
-                                    <TextBlock Text="{Binding Name}" FontWeight="SemiBold" Foreground="{DynamicResource MahApps.Brushes.Text}" VerticalAlignment="Center" FontSize="13"/>
-                                    <Border Background="{DynamicResource MahApps.Brushes.Gray8}" CornerRadius="10" Padding="8,2" Margin="10,0,0,0">
-                                        <TextBlock Text="{Binding ItemCount, StringFormat='{}{0} 个'}" Foreground="{DynamicResource MahApps.Brushes.Gray3}" VerticalAlignment="Center" FontSize="12"/>
-                                    </Border>
-                                </StackPanel>
-                            </Expander.Header>
-                            <ItemsPresenter Margin="0,2,0,0"/>
-                        </Expander>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
     </Window.Resources>
 
     <Window.InputBindings>
@@ -281,9 +243,6 @@
                       RowStyle="{StaticResource DataGridRowStyle}"
                       CellStyle="{StaticResource DataGridCellStyle}"
                       MouseDoubleClick="AddinDataGrid_MouseDoubleClick">
-                <DataGrid.GroupStyle>
-                    <GroupStyle ContainerStyle="{StaticResource GroupHeaderStyle}"/>
-                </DataGrid.GroupStyle>
                 <DataGrid.Columns>
                     <!-- 全选复选框列 -->
                     <DataGridTemplateColumn Width="50" Header="选择">

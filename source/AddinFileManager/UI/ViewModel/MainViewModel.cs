@@ -95,7 +95,7 @@ public class MainViewModel
     }
 
     /// <summary>
-    /// 插件列表（分组视图）
+    /// 插件列表视图
     /// </summary>
     public ICollectionView AddinCollectionView { get; private set; }
 
@@ -169,7 +169,6 @@ public class MainViewModel
     private void InitializeCollectionView()
     {
         var viewSource = new CollectionViewSource { Source = AddinFileItems };
-        viewSource.GroupDescriptions.Add(new PropertyGroupDescription("InstallLocation"));
         viewSource.Filter += OnFilter;
         AddinCollectionView = viewSource.View;
     }
