@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
+using MahApps.Metro.Controls;
 
 namespace AddinFileManager;
 
@@ -76,5 +77,28 @@ public partial class MainWindow : Window
         var detailsWindow = new AddinDetailsWindow(model, _viewModel);
         detailsWindow.Owner = this;
         detailsWindow.ShowDialog();
+    }
+
+    private bool _isToggling;
+
+    private void ToggleSwitch_Toggled(object sender, RoutedEventArgs e)
+    {
+        if (_isToggling) return;
+        _isToggling = true;
+        try
+        {
+            if (sender is ToggleSwitch toggle && toggle.DataContext is AddinInfoModel model)
+            {
+                var success = _viewModel.ToggleAddin(model, toggle.IsOn);
+                if (!success)
+                {
+                    toggle.IsOn = model.IsOn;
+                }
+            }
+        }
+        finally
+        {
+            _isToggling = false;
+        }
     }
 }

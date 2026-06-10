@@ -151,7 +151,7 @@ public partial class AddinDetailsWindow : Window
         // 保存启用状态
         if (StatusToggle.IsOn != _originalIsOn)
         {
-            _viewModel?.ToggleAddinCommand.Execute(_model);
+            _viewModel?.ToggleAddin(_model, StatusToggle.IsOn);
         }
 
         // 保存插件信息到文件

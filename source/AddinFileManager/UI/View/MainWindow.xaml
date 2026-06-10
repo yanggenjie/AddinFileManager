@@ -295,8 +295,9 @@
                     <DataGridTemplateColumn Width="80" Header="启用">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <mah:ToggleSwitch IsOn="{Binding IsOn, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                <mah:ToggleSwitch IsOn="{Binding IsOn, Mode=OneWay}"
                                                   OffContent="" OnContent=""
+                                                  Toggled="ToggleSwitch_Toggled"
                                                   Style="{StaticResource CenteredToggleSwitch}"/>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>

@@ -22,7 +22,6 @@ public class MainViewModel
     private ICommand _batchDisableCommand;
     private ICommand _refreshCommand;
     private ICommand _undoCommand;
-    private ICommand _toggleAddinCommand;
     private ICommand _batchDeleteCommand;
     private ICommand _deleteAddinCommand;
     private ICommand _openFolderCommand;
@@ -129,9 +128,6 @@ public class MainViewModel
     public ICommand RefreshCommand => _refreshCommand ??= new RelayCommand(_ => Refresh());
 
     public ICommand UndoCommand => _undoCommand ??= new RelayCommand(_ => Undo(), _ => CanUndo);
-
-    public ICommand ToggleAddinCommand => _toggleAddinCommand ??= new RelayCommand(
-        param => ToggleAddin(param as AddinInfoModel));
 
     public ICommand DeleteAddinCommand => _deleteAddinCommand ??= new RelayCommand(
         param => DeleteAddin(param as AddinInfoModel));
@@ -284,7 +280,7 @@ public class MainViewModel
             {
                 try
                 {
-                    RecordOperation(item);
+                    RecordOperation(item, item.IsOn);
                     _addinFileService.ToggleAddin(item, enable);
                     item.IsOn = enable;
                     successCount++;
@@ -301,21 +297,23 @@ public class MainViewModel
             : $"已批量禁用 {successCount} 个插件";
     }
 
-    private void ToggleAddin(AddinInfoModel item)
+    public bool ToggleAddin(AddinInfoModel item, bool enable)
     {
-        if (item == null) return;
+        if (item == null) return false;
 
         try
         {
-            RecordOperation(item);
-            _addinFileService.ToggleAddin(item, item.IsOn);
-            StatusMessage = item.IsOn ? $"已启用 {item.Remark}" : $"已禁用 {item.Remark}";
+            RecordOperation(item, !enable);
+            _addinFileService.ToggleAddin(item, enable);
+            item.IsOn = enable;
+            StatusMessage = enable ? $"已启用 {item.Remark}" : $"已禁用 {item.Remark}";
+            return true;
         }
         catch (Exception ex)
         {
-            item.IsOn = !item.IsOn; // 回滚状态
             _dialogService.ShowError(ex.Message);
             StatusMessage = "操作失败";
+            return false;
         }
     }
 
@@ -336,7 +334,7 @@ public class MainViewModel
         {
             try
             {
-                RecordOperation(item);
+                RecordOperation(item, item.IsOn);
                 _addinFileService.DeleteAddin(item);
                 AddinFileItems.Remove(item);
                 successCount++;
@@ -363,7 +361,7 @@ public class MainViewModel
 
         try
         {
-            RecordOperation(item);
+            RecordOperation(item, item.IsOn);
             item.LoadFullInfo();
             _addinFileService.DeleteAddin(item);
             AddinFileItems.Remove(item);
@@ -442,13 +440,13 @@ public class MainViewModel
         }
     }
 
-    private void RecordOperation(AddinInfoModel item)
+    private void RecordOperation(AddinInfoModel item, bool previousState)
     {
         _historyService.AddOperation(new OperationHistory
         {
             Type = OperationType.ToggleEnable,
             Model = item,
-            PreviousState = item.IsOn,
+            PreviousState = previousState,
             PreviousFilePath = item.FileFullPath,
             PreviousFileName = item.AddinFileName,
         });
